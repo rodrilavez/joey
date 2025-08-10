@@ -1,0 +1,416 @@
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Importar fuente pixel */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    background-color: white;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    cursor: crosshair;
+}
+
+.logo-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Formulario de signup */
+.signup-form-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.signup-form-container.visible {
+    opacity: 1;
+}
+
+.signup-form {
+    background-color: white;
+    border: 4px solid black;
+    padding: 30px;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    box-shadow: 8px 8px 0px black;
+}
+
+.signup-form h2 {
+    font-size: 16px;
+    margin-bottom: 25px;
+    color: black;
+    letter-spacing: 2px;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.signup-form input {
+    width: 300px;
+    padding: 15px;
+    border: 3px solid black;
+    background-color: white;
+    color: black;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+}
+
+.signup-form input::placeholder {
+    font-family: 'Press Start 2P', monospace;
+}
+
+.signup-form input:focus {
+    background-color: black;
+    color: white;
+}
+
+.signup-form input:focus::placeholder {
+    color: #ccc;
+}
+
+.signup-form button {
+    width: 300px;
+    padding: 15px;
+    border: 3px solid black;
+    background-color: black;
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.signup-form button:hover {
+    background-color: white;
+    color: black;
+}
+
+/* Estilos para letras individuales con colores */
+.letter {
+    display: inline-block;
+}
+
+.letter-red { color: #ff0000; }
+.letter-yellow { color: #ffff00; }
+.letter-orange { color: #ff8c00; }
+.letter-light-blue { color: #87ceeb; }
+.letter-dark-blue { color: #000080; }
+.letter-green { color: #00ff00; }
+.letter-purple { color: #800080; }
+.letter-lilac { color: #dda0dd; }
+.letter-pink { color: #ff69b4; }
+
+/* Estilos para placeholders coloridos */
+.signup-form input[data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.signup-form input:focus[data-placeholder]:empty::before {
+    color: #ccc;
+}
+
+/* Asegurar que los inputs mantengan la fuente pixel */
+.signup-form input {
+    font-family: 'Press Start 2P', monospace !important;
+    letter-spacing: 1px;
+}
+
+.signup-form button .letter {
+    pointer-events: none;
+}
+
+/* Mensaje del formulario */
+.form-message {
+    margin-top: 20px;
+    padding: 15px;
+    border: 3px solid black;
+    background-color: white;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.form-message.success {
+    background-color: white;
+    color: black;
+    border-color: black;
+}
+
+.form-message.error {
+    background-color: #ff0000;
+    color: white;
+    border-color: #aa0000;
+}
+
+/* Botón de control de sonido */
+.sound-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+}
+
+.mute-btn {
+    background-color: white;
+    border: 3px solid black;
+    padding: 10px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    box-shadow: 4px 4px 0px black;
+    transition: all 0.2s ease;
+}
+
+.mute-btn:hover {
+    background-color: black;
+    color: white;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px black;
+}
+
+.mute-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+.speaker-icon {
+    display: block;
+    font-size: 20px;
+}
+
+/* Responsive para botón de mute */
+@media (max-width: 768px) {
+    .sound-control {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .mute-btn {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .speaker-icon {
+        font-size: 16px;
+    }
+}
+
+/* Efecto de parpadeo invirtiendo colores */
+body.invert-colors {
+    filter: invert(1) !important;
+}
+
+.signup-form-container.invert-colors {
+    filter: invert(1) !important;
+}
+
+/* Responsive para formulario */
+@media (max-width: 768px) {
+    .signup-form {
+        padding: 20px;
+    }
+    
+    .signup-form h2 {
+        font-size: 12px;
+    }
+    
+    .signup-form input,
+    .signup-form button {
+        width: 250px;
+        font-size: 10px;
+        padding: 12px;
+    }
+}
+
+.joey-logo {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.joey-logo.visible {
+    opacity: 1;
+}
+
+/* Diferentes tamaños y deformaciones */
+.joey-logo.size-small {
+    width: 40px;
+    height: 40px;
+}
+
+.joey-logo.size-medium {
+    width: 80px;
+    height: 80px;
+}
+
+.joey-logo.size-large {
+    width: 120px;
+    height: 120px;
+}
+
+.joey-logo.size-xlarge {
+    width: 160px;
+    height: 160px;
+}
+
+.joey-logo.size-tiny {
+    width: 20px;
+    height: 20px;
+}
+
+/* Deformaciones */
+.joey-logo.skew-1 {
+    transform: skewX(15deg) skewY(5deg);
+}
+
+.joey-logo.skew-2 {
+    transform: skewX(-10deg) skewY(10deg);
+}
+
+.joey-logo.skew-3 {
+    transform: skewX(5deg) skewY(-15deg);
+}
+
+.joey-logo.skew-4 {
+    transform: skewX(-20deg) skewY(-5deg);
+}
+
+.joey-logo.rotate-1 {
+    transform: rotate(45deg);
+}
+
+.joey-logo.rotate-2 {
+    transform: rotate(-30deg);
+}
+
+.joey-logo.rotate-3 {
+    transform: rotate(90deg);
+}
+
+.joey-logo.rotate-4 {
+    transform: rotate(-60deg);
+}
+
+.joey-logo.scale-wide {
+    transform: scaleX(1.5) scaleY(0.8);
+}
+
+.joey-logo.scale-tall {
+    transform: scaleX(0.7) scaleY(1.4);
+}
+
+.joey-logo.scale-squish {
+    transform: scaleX(1.3) scaleY(0.6);
+}
+
+/* Combinaciones de transformaciones */
+.joey-logo.combo-1 {
+    transform: rotate(20deg) skewX(10deg) scale(0.8);
+}
+
+.joey-logo.combo-2 {
+    transform: rotate(-45deg) skewY(15deg) scaleX(1.2);
+}
+
+.joey-logo.combo-3 {
+    transform: skewX(-25deg) skewY(10deg) rotate(15deg);
+}
+
+.joey-logo.combo-4 {
+    transform: scaleX(0.6) scaleY(1.5) rotate(-20deg);
+}
+
+/* Colores - Rojo */
+.joey-logo.color-red svg g {
+    fill: #ff0000 !important;
+}
+
+/* Amarillo */
+.joey-logo.color-yellow svg g {
+    fill: #ffff00 !important;
+}
+
+/* Naranja */
+.joey-logo.color-orange svg g {
+    fill: #ff8c00 !important;
+}
+
+/* Azul claro */
+.joey-logo.color-light-blue svg g {
+    fill: #87ceeb !important;
+}
+
+/* Azul oscuro */
+.joey-logo.color-dark-blue svg g {
+    fill: #000080 !important;
+}
+
+/* Verde */
+.joey-logo.color-green svg g {
+    fill: #00ff00 !important;
+}
+
+/* Morado */
+.joey-logo.color-purple svg g {
+    fill: #800080 !important;
+}
+
+/* Lila (morado claro) */
+.joey-logo.color-lilac svg g {
+    fill: #dda0dd !important;
+}
+
+/* Rosa */
+.joey-logo.color-pink svg g {
+    fill: #ff69b4 !important;
+}
+
+/* Animaciones adicionales */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.joey-logo.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.joey-logo.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(1deg); }
+    75% { transform: rotate(-1deg); }
+}
+
+.joey-logo.animate-wiggle {
+    animation: wiggle 0.5s ease-in-out infinite;
+}

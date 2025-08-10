@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joey Cash</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="logo-container" id="logoContainer"></div>
+    
+    <!-- Botón de mute en la esquina -->
+    <div class="sound-control" id="soundControl">
+        <button id="muteBtn" class="mute-btn">
+            <span class="speaker-icon" id="speakerIcon">🔊</span>
+        </button>
+    </div>
+    
+    <div class="signup-form-container" id="signupForm">
+        <form class="signup-form" id="joeySignupForm">
+            <h2 id="joinText">JOIN NOW</h2>
+            <div class="form-group">
+                <input type="text" id="signupName" placeholder="NAME" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="signupEmail" placeholder="EMAIL" required>
+            </div>
+            <button type="submit" id="submitBtn">SUBMIT</button>
+            <div id="formMessage" class="form-message" style="display: none;"></div>
+        </form>
+    </div>
+    
+    <audio id="joeyAudio" loop preload="auto">
+        <source src="joey-song.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <script src="script.js"></script>
+</body>
+</html>

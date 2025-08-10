@@ -1,0 +1,737 @@
+// Array de colores disponibles
+const colors = [
+    'color-red',
+    'color-yellow', 
+    'color-orange',
+    'color-light-blue',
+    'color-dark-blue',
+    'color-green',
+    'color-purple',
+    'color-lilac',
+    'color-pink'
+];
+
+// Array de tamaños
+const sizes = [
+    'size-tiny',
+    'size-small',
+    'size-medium', 
+    'size-large',
+    'size-xlarge'
+];
+
+// Array de deformaciones
+const deformations = [
+    'skew-1', 'skew-2', 'skew-3', 'skew-4',
+    'rotate-1', 'rotate-2', 'rotate-3', 'rotate-4',
+    'scale-wide', 'scale-tall', 'scale-squish',
+    'combo-1', 'combo-2', 'combo-3', 'combo-4'
+];
+
+// Array de animaciones opcionales
+const animations = [
+    '', '', '', // Más posibilidades de no tener animación
+    'animate-float',
+    'animate-pulse',
+    'animate-wiggle'
+];
+
+// Variables de audio
+let audioStarted = false;
+let joeyAudio;
+let formVisible = false;
+let blinkCount = 0;
+let blinkInterval;
+let audioStartTime = 0;
+let isMuted = false;
+
+// Función para iniciar el audio
+function startAudio() {
+    if (!audioStarted && joeyAudio && !isMuted) {
+        // Configurar el audio
+        joeyAudio.volume = 0.7;
+        
+        joeyAudio.play().then(() => {
+            audioStarted = true;
+            console.log('🎵 Audio iniciado correctamente - empezando countdown de 5.3 segundos');
+            
+            // Esperar 5.3 segundos para el drop y luego mostrar formulario
+            setTimeout(() => {
+                showSignupForm();
+            }, 5300); // 5.3 segundos
+            
+        }).catch(error => {
+            console.log('❌ Error al reproducir audio:', error);
+            console.log('🔧 Tip: Algunos navegadores requieren interacción del usuario para reproducir audio');
+            // Si falla el audio, mostrar el formulario inmediatamente para testing
+            setTimeout(() => {
+                console.log('🔧 Audio falló, mostrando formulario para testing...');
+                showSignupForm();
+            }, 2000);
+        });
+    }
+}
+
+// Función para alternar mute/unmute
+function toggleMute() {
+    const speakerIcon = document.getElementById('speakerIcon');
+    
+    if (isMuted) {
+        // Unmute
+        isMuted = false;
+        if (joeyAudio) {
+            joeyAudio.muted = false;
+        }
+        speakerIcon.textContent = '🔊';
+        console.log('🔊 Audio activado');
+    } else {
+        // Mute
+        isMuted = true;
+        if (joeyAudio) {
+            joeyAudio.muted = true;
+        }
+        speakerIcon.textContent = '🔇';
+        console.log('🔇 Audio silenciado');
+    }
+}
+
+// Función para mostrar el formulario
+function showSignupForm() {
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm && !formVisible) {
+        formVisible = true;
+        signupForm.classList.add('visible');
+        console.log('Formulario mostrado');
+        
+        // Aplicar efectos de colores al texto
+        createColoredText('JOIN NOW', 'joinText');
+        createColoredText('SUBMIT', 'submitBtn');
+        
+        // Aplicar efectos a los inputs
+        const nameInput = document.getElementById('signupName');
+        const emailInput = document.getElementById('signupEmail');
+        
+        if (nameInput) {
+            applyColoredInput(nameInput);
+            // Crear placeholder colorido
+            nameInput.setAttribute('data-placeholder', 'NAME');
+        }
+        
+        if (emailInput) {
+            applyColoredInput(emailInput);
+            // Crear placeholder colorido
+            emailInput.setAttribute('data-placeholder', 'EMAIL');
+        }
+        
+        // Iniciar parpadeo después de que aparezca
+        setTimeout(() => {
+            startBlinking();
+        }, 1000);
+    }
+}
+
+// Función para el efecto de parpadeo sincronizado con el ritmo
+function startBlinking() {
+    console.log('🎵 Iniciando parpadeo sincronizado con el ritmo (17 punches)');
+    const signupForm = document.getElementById('signupForm');
+    const body = document.body;
+    blinkCount = 0;
+    
+    // Calcular timing: desde 5.3s hasta 12s = 6.7 segundos para 17 parpadeos
+    // 6700ms / 17 parpadeos = ~394ms por parpadeo
+    const blinkDuration = 6700 / 17; // ~394ms por parpadeo
+    
+    blinkInterval = setInterval(() => {
+        if (blinkCount < 17) {
+            // Alternar inversión de colores para simular los punches
+            if (blinkCount % 2 === 0) {
+                body.style.filter = 'invert(1)';
+                console.log(`🎵 Punch ${Math.floor(blinkCount/2) + 1}/17 - ON`);
+            } else {
+                body.style.filter = 'invert(0)';
+                console.log(`🎵 Punch ${Math.floor(blinkCount/2) + 1}/17 - OFF`);
+            }
+            blinkCount++;
+        } else {
+            // Detener parpadeo al final de la canción
+            clearInterval(blinkInterval);
+            body.style.filter = 'invert(0)';
+            console.log('🎵 Parpadeo terminado - fin de la canción');
+        }
+    }, blinkDuration);
+}
+
+// Manejar envío del formulario
+function handleFormSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const messageDiv = document.getElementById('formMessage');
+    
+    if (name && email) {
+        // Mostrar mensaje de éxito
+        messageDiv.innerHTML = '';
+        messageDiv.className = 'form-message success';
+        messageDiv.style.display = 'block';
+        
+        // Crear texto colorido para el mensaje
+        const successMessage = `WELCOME ${name.toUpperCase()}! YOU'RE IN THE JOURNEY!`;
+        createColoredTextInElement(successMessage, messageDiv);
+        
+        // Ocultar los campos del formulario
+        document.getElementById('signupName').style.display = 'none';
+        document.getElementById('signupEmail').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('joinText').style.display = 'none';
+        
+    } else {
+        // Mostrar mensaje de error
+        messageDiv.innerHTML = '';
+        messageDiv.className = 'form-message error';
+        messageDiv.style.display = 'block';
+        
+        const errorMessage = 'PLEASE FILL ALL FIELDS!';
+        createColoredTextInElement(errorMessage, messageDiv);
+    }
+}
+
+// Función auxiliar para crear texto colorido en cualquier elemento
+function createColoredTextInElement(text, element) {
+    element.innerHTML = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const letter = text[i];
+        const span = document.createElement('span');
+        span.className = 'letter';
+        
+        // Cada 3ra letra es minúscula, las demás mayúsculas
+        if ((i + 1) % 3 === 0) {
+            span.textContent = letter.toLowerCase();
+        } else {
+            span.textContent = letter.toUpperCase();
+        }
+        
+        // Asignar color aleatorio si no es espacio
+        if (letter !== ' ') {
+            const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
+            span.classList.add(randomColor);
+        }
+        
+        element.appendChild(span);
+    }
+}
+
+// Array de colores para las letras
+const letterColors = [
+    'letter-red', 'letter-yellow', 'letter-orange',
+    'letter-light-blue', 'letter-dark-blue', 'letter-green',
+    'letter-purple', 'letter-lilac', 'letter-pink'
+];
+
+// Función para crear texto con letras coloridas y patrón mayúscula/minúscula
+function createColoredText(text, elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    element.innerHTML = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const letter = text[i];
+        const span = document.createElement('span');
+        span.className = 'letter';
+        
+        // Cada 3ra letra es minúscula, las demás mayúsculas
+        if ((i + 1) % 3 === 0) {
+            span.textContent = letter.toLowerCase();
+        } else {
+            span.textContent = letter.toUpperCase();
+        }
+        
+        // Asignar color aleatorio si no es espacio
+        if (letter !== ' ') {
+            const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
+            span.classList.add(randomColor);
+        }
+        
+        element.appendChild(span);
+    }
+}
+
+// Función para crear placeholders coloridos
+function createColoredPlaceholder(text) {
+    let coloredText = '';
+    for (let i = 0; i < text.length; i++) {
+        const letter = text[i];
+        if (letter !== ' ') {
+            // Cada 3ra letra es minúscula, las demás mayúsculas
+            const finalLetter = (i + 1) % 3 === 0 ? letter.toLowerCase() : letter.toUpperCase();
+            const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
+            coloredText += `<span class="letter ${randomColor}">${finalLetter}</span>`;
+        } else {
+            coloredText += ' ';
+        }
+    }
+    return coloredText;
+}
+
+// Función para aplicar efecto de colores al texto que escribe el usuario
+function applyColoredInput(inputElement) {
+    inputElement.addEventListener('input', function() {
+        const value = this.value;
+        // Crear un elemento temporal para mostrar el texto coloreado
+        let coloredValue = '';
+        
+        for (let i = 0; i < value.length; i++) {
+            const letter = value[i];
+            if (letter !== ' ') {
+                // Cada 3ra letra es minúscula, las demás mayúsculas
+                const finalLetter = (i + 1) % 3 === 0 ? letter.toLowerCase() : letter.toUpperCase();
+                const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
+                coloredValue += finalLetter;
+            } else {
+                coloredValue += ' ';
+            }
+        }
+        
+        // Actualizar el valor del input transformado
+        this.value = coloredValue;
+    });
+}
+
+// SVG del logo Joey (base)
+const logoSVG = `
+<svg viewBox="0 0 816 306" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(0,306) scale(0.1,-0.1)" fill="currentColor" stroke="none">
+<path d="M1528 2668 c-3 -21 -9 -23 -56 -23 -47 0 -52 -2 -52 -22 0 -18 -6
+-23 -25 -23 -20 0 -25 -5 -25 -25 0 -18 -5 -25 -20 -25 -13 0 -20 -7 -20 -18
+0 -10 -5 -23 -11 -29 -5 -5 -13 -37 -16 -69 -3 -32 -12 -62 -19 -67 -7 -4 -11
+-14 -8 -22 4 -8 -1 -18 -10 -21 -11 -4 -16 -19 -16 -50 0 -24 -4 -44 -10 -44
+-5 0 -10 -20 -10 -45 0 -25 -4 -45 -10 -45 -6 0 -10 -30 -10 -70 0 -40 -4 -70
+-10 -70 -6 0 -10 -58 -10 -154 0 -93 -4 -157 -10 -161 -5 -3 -10 -44 -10 -91
+0 -49 4 -84 10 -84 6 0 10 -62 10 -165 0 -103 4 -165 10 -165 6 0 10 -28 10
+-64 0 -36 5 -68 10 -71 6 -3 10 -35 10 -71 0 -36 4 -64 10 -64 6 0 10 -11 10
+-24 0 -13 6 -26 14 -29 8 -3 13 -17 11 -37 -1 -17 3 -37 11 -44 7 -8 16 -32
+20 -55 4 -23 10 -41 15 -41 5 0 9 -9 9 -20 0 -13 7 -20 20 -20 15 0 20 -7 20
+-25 0 -20 5 -25 25 -25 20 0 25 -5 25 -25 0 -21 5 -25 30 -25 23 0 30 -4 30
+-20 0 -18 7 -20 70 -20 63 0 70 2 70 20 0 17 7 20 45 20 41 0 45 2 45 25 0 18
+5 25 20 25 15 0 20 7 20 25 0 14 5 25 10 25 6 0 10 9 10 20 0 11 5 20 10 20 6
+0 10 7 10 15 0 8 9 30 20 50 11 20 20 44 20 55 0 11 5 20 10 20 6 0 10 20 10
+45 0 25 5 45 10 45 6 0 10 18 10 39 0 22 5 43 10 46 5 3 10 37 10 76 0 39 4
+69 10 69 6 0 10 36 10 89 0 54 4 91 11 93 14 5 13 542 -1 546 -6 2 -10 44 -10
+93 0 53 -4 89 -10 89 -6 0 -10 28 -10 65 0 37 -4 65 -10 65 -5 0 -10 23 -10
+50 0 28 -4 50 -10 50 -5 0 -10 9 -10 20 0 11 -4 20 -10 20 -5 0 -10 20 -10 44
+0 25 -4 48 -10 51 -5 3 -10 15 -10 26 0 10 -4 19 -10 19 -5 0 -10 11 -10 25 0
+14 -4 25 -10 25 -5 0 -10 9 -10 20 0 15 -7 20 -24 20 -21 0 -24 4 -20 24 3 19
+-1 25 -18 28 -12 2 -25 12 -28 23 -4 16 -13 20 -50 20 -39 0 -45 3 -48 23 -2
+16 -10 22 -27 22 -17 0 -25 -6 -27 -22z m82 -357 c0 -10 9 -21 20 -24 12 -3
+20 -14 20 -26 0 -14 6 -21 20 -21 15 0 20 -7 20 -25 0 -14 5 -25 10 -25 6 0
+10 -20 10 -45 0 -25 5 -45 10 -45 6 0 10 -9 10 -19 0 -10 7 -22 16 -25 14 -5
+16 -20 12 -96 -3 -69 -1 -90 9 -90 19 0 19 -548 1 -555 -9 -4 -12 -24 -10 -65
+3 -48 1 -61 -12 -66 -11 -4 -16 -19 -16 -49 0 -24 -4 -47 -10 -50 -5 -3 -10
+-26 -10 -51 0 -24 -4 -44 -10 -44 -5 0 -10 -9 -10 -20 0 -13 -7 -20 -20 -20
+-14 0 -20 -7 -20 -21 0 -12 -8 -23 -19 -26 -11 -3 -21 -15 -23 -27 -3 -18 -11
+-21 -55 -24 -51 -3 -53 -2 -53 22 0 18 -6 25 -22 28 -17 2 -22 9 -20 25 2 16
+-2 23 -12 23 -9 0 -16 9 -16 20 0 11 -4 20 -10 20 -5 0 -10 11 -10 25 0 14 -4
+25 -10 25 -5 0 -10 11 -10 25 0 14 -4 25 -10 25 -5 0 -10 18 -10 39 0 22 -4
+43 -10 46 -6 3 -10 52 -10 111 0 82 -3 109 -16 121 -21 21 -19 362 2 370 11 4
+14 31 14 114 0 66 4 109 10 109 6 0 10 23 10 50 0 28 5 50 10 50 6 0 10 9 10
+20 0 11 5 20 10 20 6 0 10 11 10 25 0 14 5 25 10 25 6 0 10 11 10 24 0 13 7
+26 15 30 8 3 15 9 14 13 -4 24 4 33 31 33 23 0 30 4 30 20 0 17 7 20 45 20 37
+0 45 -3 45 -19z"/>
+<path d="M2850 2600 c0 -56 3 -70 15 -70 8 0 15 -9 15 -19 0 -11 9 -23 20 -26
+16 -5 20 -15 20 -51 0 -32 4 -44 15 -44 11 0 15 -12 16 -42 1 -24 1 -46 0 -50
+0 -5 6 -8 14 -8 11 0 15 -12 15 -50 0 -43 3 -50 20 -50 17 0 20 -7 20 -45 0
+-33 4 -45 15 -45 11 0 15 -12 15 -50 0 -43 3 -50 20 -50 17 0 20 -7 20 -45 0
+-33 4 -45 15 -45 11 0 15 -12 15 -50 0 -38 4 -50 15 -50 11 0 15 -12 15 -50 0
+-33 4 -45 15 -45 11 0 15 -12 15 -50 0 -43 3 -50 20 -50 17 0 20 -7 20 -50 0
+-38 4 -50 15 -50 11 0 15 -12 15 -50 0 -43 3 -50 20 -50 17 0 20 -7 20 -45 0
+-33 4 -45 15 -45 13 0 15 -61 15 -485 l0 -485 130 0 130 0 0 506 c0 497 0 506
+20 511 16 4 20 14 20 49 0 37 3 44 20 44 17 0 20 7 20 50 0 38 4 50 15 50 11 0
+15 12 15 50 0 38 4 50 15 50 11 0 15 12 15 44 0 35 4 45 20 49 16 4 20 14 20
+51 0 34 4 46 15 46 9 0 15 9 15 25 0 18 5 25 20 25 17 0 20 7 20 50 0 38 4 50
+15 50 11 0 15 11 15 41 0 33 4 42 21 46 16 5 20 13 19 42 -3 55 -1 61 15 61 11
+0 15 12 15 45 0 31 5 47 15 51 10 4 15 20 15 50 0 32 4 44 15 44 11 0 15 12 15
+50 0 43 3 50 20 50 17 0 20 7 20 45 l0 45 -135 0 -135 0 0 -25 c0 -18 -5 -25
+-20 -25 -17 0 -20 -7 -20 -44 0 -30 -5 -46 -15 -50 -10 -4 -15 -20 -15 -50 0
+-30 -5 -46 -15 -50 -10 -3 -15 -19 -15 -46 0 -27 -5 -43 -15 -46 -10 -4 -15
+-20 -15 -50 0 -37 -3 -44 -20 -44 -17 0 -20 -7 -20 -50 0 -38 -4 -50 -15 -50
+-11 0 -15 -12 -15 -45 0 -38 -3 -45 -20 -45 -17 0 -20 -7 -20 -50 0 -38 -4 -50
+-15 -50 -11 0 -15 -12 -15 -50 l0 -50 -35 0 c-35 0 -35 0 -35 46 0 37 -4 47
+-20 51 -17 4 -20 14 -20 54 0 37 -4 49 -15 49 -11 0 -15 12 -15 45 0 38 -3 45
+-20 45 -17 0 -20 7 -20 50 0 38 -4 50 -15 50 -11 0 -15 12 -15 44 0 35 -4 45
+-20 49 -16 4 -20 14 -20 51 0 31 -4 45 -12 44 -9 -2 -14 14 -16 50 -3 44 -6 52
+-23 52 -16 0 -19 7 -19 44 0 30 -5 46 -15 50 -8 3 -15 15 -15 26 0 19 -6 20
+-130 20 l-130 0 0 -70z"/>
+<path d="M2360 2630 c0 -30 -1 -30 -55 -30 l-55 0 0 -35 c0 -24 -5 -35 -15
+-35 -10 0 -15 -10 -15 -30 0 -20 -5 -30 -15 -30 -10 0 -15 -10 -15 -30 0 -20
+-5 -30 -15 -30 -10 0 -15 -10 -15 -31 0 -22 -5 -32 -20 -36 -17 -5 -20 -14
+-20 -64 0 -42 -4 -59 -13 -59 -9 0 -14 -17 -14 -57 -2 -77 -1 -73 -18 -73 -13
+0 -15 -24 -15 -160 0 -136 -2 -160 -15 -160 -13 0 -15 -31 -15 -215 0 -184 2
+-215 15 -215 13 0 15 -24 15 -155 0 -134 2 -155 17 -163 13 -8 16 -22 14 -66
+-2 -45 1 -56 13 -56 13 0 16 -12 16 -61 0 -52 3 -62 20 -66 14 -4 20 -14 20
+-34 0 -19 5 -29 15 -29 10 0 15 -10 15 -29 0 -16 6 -31 15 -35 9 -3 15 -18 15
+-36 0 -28 3 -30 35 -30 32 0 35 -2 35 -30 0 -29 2 -30 45 -30 45 0 45 0 45
+-35 l0 -35 79 0 80 0 3 33 c3 31 5 32 51 35 45 3 47 5 47 33 0 26 3 29 30 29
+28 0 30 3 30 35 0 28 4 35 20 35 16 0 20 7 20 30 0 20 5 30 15 30 12 0 15 13
+15 60 0 47 3 60 15 60 16 0 16 1 19 74 1 29 6 51 14 54 8 2 12 25 12 63 0 59
+0 59 -29 59 -26 0 -30 4 -33 32 -3 31 -4 32 -58 35 -84 4 -100 -2 -100 -37 0
+-20 -5 -30 -15 -30 -12 0 -15 -14 -15 -65 0 -51 -3 -65 -15 -65 -10 0 -15 -10
+-15 -30 l0 -30 -85 0 -85 0 0 30 c0 20 -5 30 -15 30 -10 0 -15 10 -15 29 0 20
+-6 30 -20 34 -17 4 -20 14 -20 71 0 52 -3 66 -15 66 -13 0 -15 21 -15 125 l0
+125 295 0 295 0 0 155 c0 148 -1 155 -20 155 -19 0 -20 7 -20 159 0 126 -3
+160 -14 164 -10 4 -13 27 -12 96 1 81 0 91 -16 91 -15 0 -18 9 -18 59 0 43 -4
+60 -15 65 -9 3 -15 18 -15 35 0 20 -6 30 -20 34 -14 3 -20 14 -20 31 0 16 -6
+26 -15 26 -10 0 -15 10 -15 29 0 16 -6 31 -15 35 -9 3 -15 18 -15 36 0 29 -1
+30 -50 30 -49 0 -50 1 -50 30 l0 30 -90 0 -90 0 0 -30z m190 -435 c0 -24 5
+-35 15 -35 12 0 15 -13 15 -60 0 -47 3 -60 15 -60 13 0 15 -25 15 -165 l0
+-165 -165 0 -165 0 0 165 c0 140 2 165 15 165 10 0 15 10 15 30 0 23 4 30 20
+30 16 0 20 7 20 30 0 20 5 30 15 30 10 0 15 11 15 35 l0 35 85 0 85 0 0 -35z"/>
+<path d="M913 2642 l-43 -3 0 -845 c0 -556 -3 -844 -10 -844 -5 0 -10 -8 -10
+-18 0 -10 -5 -23 -11 -29 -6 -6 -12 -19 -13 -29 -2 -15 -13 -20 -44 -22 -39
+-3 -42 -1 -42 22 0 14 -4 26 -10 26 -5 0 -10 11 -10 25 0 14 -4 25 -10 25 -5
+0 -10 20 -10 44 0 28 -5 46 -14 49 -11 4 -13 25 -10 91 l3 86 -54 0 c-44 0
+-53 -3 -49 -15 4 -10 -3 -18 -20 -25 l-26 -10 0 -130 c0 -80 4 -130 10 -130 6
+0 10 -30 10 -70 0 -38 4 -70 9 -70 15 0 41 -60 41 -96 0 -18 5 -36 10 -39 5
+-3 10 -15 10 -26 0 -12 7 -19 20 -19 15 0 20 -7 20 -25 0 -22 4 -25 35 -25 28
+0 35 -4 35 -20 0 -17 7 -20 45 -20 38 0 45 3 45 20 0 16 7 20 35 20 31 0 35 3
+35 25 0 18 5 25 20 25 13 0 20 7 20 19 0 11 4 23 10 26 5 3 10 15 10 26 0 10
+5 19 10 19 6 0 10 9 10 20 0 11 7 23 15 26 10 4 15 20 15 49 0 26 5 45 13 47
+9 4 13 198 15 914 l4 909 -39 0 c-21 0 -57 -1 -80 -3z"/>
+<path d="M4720 2585 c0 -24 -3 -25 -60 -25 -57 0 -60 -1 -60 -25 0 -18 -5 -25
+-20 -25 -13 0 -20 -7 -20 -20 0 -11 -4 -20 -10 -20 -5 0 -10 -11 -10 -25 0
+-14 -4 -25 -10 -25 -5 0 -10 -9 -10 -20 0 -11 -4 -20 -10 -20 -5 0 -10 -9 -10
+-20 0 -11 -7 -23 -15 -26 -8 -4 -15 -17 -15 -30 0 -13 -4 -24 -10 -24 -5 0
+-10 -9 -10 -19 0 -11 -5 -21 -12 -23 -13 -5 -26 -87 -27 -169 -1 -41 -5 -58
+-16 -63 -12 -4 -15 -25 -15 -96 0 -53 -4 -90 -10 -90 -6 0 -10 -122 -10 -345
+0 -223 4 -345 10 -345 6 0 10 -36 10 -89 0 -67 3 -90 14 -94 10 -4 16 -32 21
+-91 5 -63 11 -86 21 -86 8 0 14 -10 14 -25 0 -14 5 -25 10 -25 6 0 10 -20 10
+-44 0 -30 5 -46 15 -50 8 -3 15 -15 15 -26 0 -11 5 -20 10 -20 6 0 10 -11 10
+-25 0 -18 5 -25 20 -25 13 0 20 -7 20 -20 0 -13 7 -20 19 -20 13 0 21 -8 23
+-22 2 -18 11 -24 36 -26 24 -2 32 -8 32 -23 0 -17 7 -19 70 -19 63 0 70 2 70
+20 0 16 7 20 30 20 25 0 30 4 30 25 0 18 5 25 20 25 13 0 20 7 20 20 0 11 7
+20 15 20 9 0 15 9 15 25 0 18 5 25 20 25 17 0 20 7 20 45 0 25 5 45 10 45 6 0
+10 11 10 25 0 16 6 25 15 25 11 0 15 12 15 45 0 25 5 45 10 45 6 0 10 20 10
+45 0 25 5 45 10 45 6 0 10 37 10 90 0 53 -4 90 -10 90 -5 0 -10 10 -10 23 0
+18 -5 23 -22 23 -18 -1 -24 5 -26 27 -3 22 -8 28 -25 27 -39 -4 -46 0 -50 23
+-2 12 -5 -8 -6 -45 0 -37 -5 -70 -11 -73 -5 -3 -10 -26 -10 -51 0 -30 -5 -46
+-15 -50 -10 -4 -15 -20 -15 -45 0 -21 -4 -39 -10 -39 -5 0 -10 -11 -10 -25 0
+-14 -4 -25 -10 -25 -5 0 -10 -9 -10 -20 0 -15 -7 -20 -25 -20 -20 0 -25 -5
+-25 -25 0 -24 -3 -25 -55 -25 -52 0 -55 1 -55 25 0 20 -5 25 -25 25 -18 0 -25
+5 -25 20 0 11 -4 20 -10 20 -5 0 -10 11 -10 25 0 14 -6 25 -14 25 -13 0 -26
+84 -26 177 0 23 -4 45 -10 48 -6 4 -10 140 -10 376 0 239 4 369 10 369 6 0 10
+26 10 58 0 82 10 132 26 132 10 0 14 14 14 45 0 41 2 45 25 45 20 0 25 5 25
+25 0 18 5 25 19 25 13 0 21 8 23 23 2 18 10 23 46 25 39 3 42 1 42 -22 0 -21
+5 -26 25 -26 20 0 25 -5 25 -25 0 -14 5 -25 10 -25 6 0 10 -9 10 -20 0 -11 5
+-20 10 -20 6 0 10 -11 10 -25 0 -16 6 -25 15 -25 11 0 15 -12 15 -44 0 -25 5
+-48 10 -51 6 -3 10 -26 10 -51 0 -37 3 -44 20 -44 15 0 20 7 20 25 0 21 5 25
+29 25 23 0 30 5 33 23 2 14 11 23 26 25 20 3 22 9 22 68 0 36 -4 64 -10 64 -6
+0 -10 30 -10 70 0 39 -4 70 -9 70 -16 0 -41 61 -41 102 0 21 -4 38 -10 38 -5
+0 -10 9 -10 20 0 11 -4 20 -10 20 -5 0 -10 11 -10 25 0 20 -5 25 -25 25 -18 0
+-25 5 -25 20 0 13 -7 20 -20 20 -15 0 -20 7 -20 25 0 23 -4 25 -45 25 -41 0
+-45 2 -45 25 0 21 -5 25 -30 25 -25 0 -30 -4 -30 -25z"/>
+<path d="M6320 2585 c0 -22 -4 -25 -39 -25 -33 0 -40 -4 -43 -22 -2 -15 -11
+-24 -25 -26 -15 -2 -23 -10 -23 -23 0 -12 -7 -19 -20 -19 -15 0 -20 -7 -20
+-25 0 -16 -6 -25 -15 -25 -11 0 -15 -11 -15 -39 0 -22 -4 -43 -10 -46 -5 -3
+-10 -26 -10 -51 0 -24 -4 -44 -10 -44 -6 0 -10 -30 -10 -69 0 -52 -4 -70 -15
+-75 -12 -4 -15 -24 -15 -86 0 -62 3 -82 15 -86 12 -5 15 -25 15 -95 0 -53 4
+-89 10 -89 6 0 10 -22 10 -50 0 -27 5 -50 10 -50 6 0 10 -9 10 -19 0 -10 6
+-21 14 -24 8 -3 18 -26 21 -51 5 -29 12 -46 21 -46 8 0 14 -9 14 -20 0 -15 7
+-20 25 -20 20 0 25 -5 25 -25 0 -21 5 -25 30 -25 25 0 30 -4 30 -25 0 -21 5
+-25 31 -25 22 0 32 -5 36 -20 4 -14 14 -20 34 -20 24 0 29 -4 29 -25 0 -22 4
+-25 35 -25 28 0 35 -4 35 -20 0 -11 5 -20 10 -20 6 0 10 -22 10 -49 0 -34 4
+-51 15 -55 12 -4 15 -24 15 -91 0 -67 -3 -87 -15 -91 -9 -4 -15 -19 -15 -40 0
+-19 -4 -42 -9 -52 -5 -9 -12 -25 -15 -34 -3 -10 -15 -18 -26 -18 -13 0 -20 -7
+-20 -20 0 -18 -7 -20 -70 -20 -63 0 -70 2 -70 20 0 13 -7 20 -20 20 -11 0 -23
+8 -26 18 -3 9 -10 25 -15 34 -5 10 -9 25 -9 33 0 8 -4 15 -10 15 -5 0 -9 18
+-7 40 2 28 -1 40 -10 40 -9 0 -13 19 -13 70 0 39 -4 70 -9 70 -5 0 -11 12 -13
+27 -4 39 -36 43 -40 6 -3 -27 -5 -28 -56 -28 l-52 0 0 -92 c0 -55 4 -93 10
+-93 6 0 10 -28 10 -64 0 -48 4 -65 15 -70 9 -3 15 -19 15 -41 0 -19 4 -43 10
+-53 5 -9 12 -43 15 -74 5 -41 11 -58 21 -58 8 0 14 -10 14 -25 0 -18 5 -25 20
+-25 13 0 20 -7 20 -19 0 -10 7 -21 15 -25 8 -3 15 -15 15 -26 0 -17 6 -20 45
+-20 41 0 45 -2 45 -25 0 -24 2 -25 75 -25 73 0 75 1 75 25 0 23 4 25 45 25 39
+0 45 3 45 21 0 12 8 23 20 26 11 3 20 14 20 24 0 11 5 19 10 19 6 0 10 9 10
+19 0 11 5 23 10 26 6 3 10 15 10 26 0 11 6 22 13 25 8 3 12 19 10 45 -1 27 3
+42 13 46 9 3 14 20 14 49 0 24 5 44 10 44 6 0 10 90 10 249 0 156 -4 252 -10
+256 -5 3 -10 24 -10 45 0 21 -4 42 -10 45 -5 3 -10 26 -10 51 0 31 -4 44 -14
+44 -13 0 -31 51 -27 78 1 6 -5 12 -14 12 -8 0 -15 8 -15 19 0 10 -9 21 -20 24
+-12 3 -20 14 -20 25 0 17 -7 21 -37 24 -31 2 -39 7 -41 26 -3 16 -10 22 -29
+22 -16 0 -27 7 -30 20 -4 14 -14 20 -34 20 -24 0 -29 4 -29 25 0 22 -4 25 -35
+25 -28 0 -35 4 -35 20 0 11 -4 20 -10 20 -5 0 -10 11 -10 24 0 14 -4 28 -10
+31 -6 4 -10 55 -10 121 0 69 4 114 10 114 6 0 10 11 10 25 0 18 5 25 19 25 10
+0 21 9 24 20 4 17 14 20 71 20 59 0 66 -2 66 -20 0 -13 7 -20 19 -20 22 0 31
+-19 31 -66 0 -19 5 -34 10 -34 6 0 10 -20 10 -45 0 -25 5 -45 10 -45 6 0 10
+-20 10 -45 l0 -45 40 0 c22 0 41 5 41 10 1 6 2 16 3 23 0 6 16 13 34 15 l32 3
+0 109 c0 89 -3 109 -16 114 -11 4 -15 16 -12 43 2 22 -2 38 -10 41 -7 2 -12
+23 -12 53 0 27 -4 49 -10 49 -5 0 -10 9 -10 20 0 11 -4 20 -10 20 -5 0 -10 11
+-10 25 0 18 -5 25 -20 25 -13 0 -20 7 -20 19 0 13 -8 21 -22 23 -15 2 -24 11
+-26 26 -3 19 -9 22 -48 22 -40 0 -44 2 -44 25 0 23 -4 25 -40 25 -36 0 -40 -2
+-40 -25z"/>
+<path d="M6880 1987 c0 -332 -3 -827 -7 -1100 l-6 -497 141 0 142 0 0 570 0
+570 25 0 c21 0 25 5 25 30 0 20 5 30 15 30 8 0 15 7 15 16 0 9 9 18 20 21 13
+3 20 14 20 29 0 24 2 24 95 24 95 0 95 0 95 -25 0 -16 6 -25 15 -25 11 0 15
+-12 15 -50 0 -43 3 -50 20 -50 20 0 20 -7 20 -570 l0 -570 120 0 120 0 0 640
+c0 562 -2 640 -15 640 -12 0 -15 15 -15 75 0 68 -2 75 -20 75 -15 0 -20 7 -20
+25 0 16 -6 25 -15 25 -9 0 -15 9 -15 21 0 12 -8 23 -20 26 -11 3 -20 14 -20
+24 0 15 -7 19 -34 19 -28 0 -35 4 -40 25 -6 25 -8 25 -111 25 l-105 0 0 -25
+c0 -21 -5 -25 -30 -25 -23 0 -30 -4 -30 -20 0 -13 -7 -20 -20 -20 -14 0 -20
+-7 -20 -24 0 -15 -7 -26 -21 -29 -13 -3 -19 -12 -17 -24 2 -13 -4 -19 -24 -21
+l-28 -3 0 385 0 386 -135 0 -135 0 0 -603z"/>
+<path d="M5470 2535 c0 -14 -4 -25 -10 -25 -6 0 -10 -26 -10 -59 0 -33 -4 -63
+-10 -66 -5 -3 -10 -37 -10 -76 0 -39 -4 -69 -10 -69 -6 0 -10 -30 -10 -69 0
+-38 -4 -71 -9 -73 -5 -1 -11 -42 -13 -90 -2 -62 -7 -88 -15 -88 -9 0 -13 -21
+-13 -70 0 -40 -4 -70 -10 -70 -6 0 -10 -30 -10 -70 0 -40 -4 -70 -10 -70 -6 0
+-10 -28 -10 -65 0 -49 -4 -67 -15 -71 -11 -5 -15 -23 -15 -75 0 -39 -4 -69
+-10 -69 -6 0 -10 -30 -10 -70 0 -57 -3 -70 -16 -70 -13 0 -15 -11 -13 -64 2
+-36 0 -68 -4 -72 -4 -4 -7 -36 -7 -70 0 -35 -4 -66 -10 -69 -5 -3 -10 -46 -10
+-96 0 -72 -3 -89 -15 -89 -12 0 -15 -14 -15 -70 0 -40 -4 -70 -10 -70 -6 0
+-10 -30 -10 -70 0 -57 -3 -70 -16 -70 -9 0 -14 -7 -12 -18 3 -14 17 -17 91
+-20 l87 -3 0 26 c0 14 5 25 10 25 6 0 10 28 10 65 0 49 4 67 15 71 12 5 15 25
+15 95 0 49 4 89 9 89 6 0 11 21 13 47 l3 48 175 0 175 0 9 -137 c7 -105 12
+-138 22 -138 11 0 14 -22 14 -95 l0 -95 100 0 c91 0 100 2 100 19 0 10 -6 21
+-14 24 -11 4 -14 22 -13 71 1 43 -2 67 -10 70 -8 3 -11 27 -10 70 1 47 -2 66
+-10 66 -9 0 -13 20 -13 64 0 36 -4 68 -10 71 -5 3 -10 37 -10 76 0 39 -4 69
+-10 69 -6 0 -10 30 -10 69 0 46 -4 71 -12 73 -7 3 -13 22 -14 44 -6 128 -18
+220 -30 227 -10 6 -14 33 -14 97 0 53 -4 90 -10 90 -6 0 -10 30 -10 70 0 56
+-3 70 -15 70 -12 0 -15 14 -15 69 0 39 -4 73 -10 76 -5 3 -10 33 -10 65 0 32
+-4 62 -10 65 -5 3 -10 35 -10 71 0 36 -4 64 -10 64 -6 0 -10 30 -10 70 0 40
+-4 70 -10 70 -6 0 -10 30 -10 70 0 56 -3 70 -15 70 -11 0 -15 12 -15 45 l0 45
+-85 0 c-84 0 -85 0 -85 -25z m100 -570 c0 -25 4 -45 9 -45 5 0 12 -63 16 -140
+6 -109 10 -140 21 -140 11 0 14 -16 14 -65 0 -37 4 -65 10 -65 6 0 10 -37 10
+-90 0 -71 3 -92 15 -96 8 -4 15 -17 15 -30 0 -24 0 -24 -120 -24 l-120 0 0 70
+c0 40 4 70 10 70 6 0 10 30 10 69 0 52 4 70 15 75 12 4 15 25 15 96 0 53 4 90
+10 90 6 0 10 28 10 65 0 37 4 65 10 65 6 0 10 30 10 70 0 63 2 70 20 70 17 0
+20 -7 20 -45z"/>
+</g>
+</svg>
+`;
+
+// Variables para controlar la aparición de logos
+let logoIndex = 0;
+let lastMousePosition = { x: 0, y: 0 };
+let isMouseMoving = false;
+let mouseTimeout;
+
+// Función para obtener una clase aleatoria de un array
+function getRandomClass(classArray) {
+    return classArray[Math.floor(Math.random() * classArray.length)];
+}
+
+// Función para crear un logo en una posición específica
+function createLogo(x, y) {
+    const logoContainer = document.getElementById('logoContainer');
+    const logoElement = document.createElement('div');
+    
+    // Configurar el elemento
+    logoElement.innerHTML = logoSVG;
+    logoElement.className = 'joey-logo';
+    logoElement.id = `logo-${logoIndex++}`;
+    
+    // Añadir clases aleatorias
+    logoElement.classList.add(getRandomClass(colors));
+    logoElement.classList.add(getRandomClass(sizes));
+    logoElement.classList.add(getRandomClass(deformations));
+    logoElement.classList.add(getRandomClass(animations));
+    
+    // Posicionar el logo
+    logoElement.style.left = (x - 25) + 'px'; // Centrar en el cursor
+    logoElement.style.top = (y - 25) + 'px';
+    
+    // Añadir al container
+    logoContainer.appendChild(logoElement);
+    
+    // Hacer visible con fade in
+    setTimeout(() => {
+        logoElement.classList.add('visible');
+    }, 10);
+    
+    // Opcional: eliminar el logo después de un tiempo para no saturar la página
+    setTimeout(() => {
+        if (logoElement && logoElement.parentNode) {
+            logoElement.style.opacity = '0';
+            setTimeout(() => {
+                if (logoElement && logoElement.parentNode) {
+                    logoElement.parentNode.removeChild(logoElement);
+                }
+            }, 500);
+        }
+    }, 15000); // 15 segundos
+}
+
+// Función para crear logos múltiples en posiciones aleatorias cerca del cursor
+function createMultipleLogos(centerX, centerY) {
+    const numLogos = Math.floor(Math.random() * 3) + 1; // 1-3 logos
+    
+    for (let i = 0; i < numLogos; i++) {
+        // Crear posición aleatoria cerca del cursor
+        const offsetX = (Math.random() - 0.5) * 100; // -50 a 50 pixels
+        const offsetY = (Math.random() - 0.5) * 100;
+        const x = centerX + offsetX;
+        const y = centerY + offsetY;
+        
+        // Asegurar que esté dentro de la pantalla
+        const clampedX = Math.max(25, Math.min(window.innerWidth - 25, x));
+        const clampedY = Math.max(25, Math.min(window.innerHeight - 25, y));
+        
+        createLogo(clampedX, clampedY);
+    }
+}
+
+// Función para prellenar la página con logos
+function preloadLogos() {
+    const numPreloadLogos = 50; // Número de logos iniciales
+    
+    for (let i = 0; i < numPreloadLogos; i++) {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        
+        setTimeout(() => {
+            createLogo(x, y);
+        }, Math.random() * 2000); // Aparecer en los primeros 2 segundos
+    }
+}
+
+// Event listeners
+document.addEventListener('mousemove', function(e) {
+    // Iniciar audio en la primera interacción
+    startAudio();
+    
+    const currentTime = Date.now();
+    
+    // Calcular distancia del movimiento
+    const distance = Math.sqrt(
+        Math.pow(e.clientX - lastMousePosition.x, 2) + 
+        Math.pow(e.clientY - lastMousePosition.y, 2)
+    );
+    
+    // Solo crear logos si el mouse se movió una distancia mínima
+    if (distance > 20) {
+        createMultipleLogos(e.clientX, e.clientY);
+        lastMousePosition = { x: e.clientX, y: e.clientY };
+    }
+    
+    // Marcar que el mouse se está moviendo
+    isMouseMoving = true;
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(() => {
+        isMouseMoving = false;
+    }, 100);
+});
+
+// Crear logos al hacer click
+document.addEventListener('click', function(e) {
+    // Iniciar audio en la primera interacción
+    startAudio();
+    createMultipleLogos(e.clientX, e.clientY);
+    
+    // Testing: mostrar formulario inmediatamente en click
+    if (!formVisible) {
+        setTimeout(() => {
+            console.log('🔧 Mostrando formulario por click...');
+            showSignupForm();
+        }, 1000);
+    }
+});
+
+// Iniciar audio con cualquier tecla presionada
+document.addEventListener('keydown', function(e) {
+    startAudio();
+    
+    // Testing: si presiona 'F' mostrar formulario
+    if (e.key.toLowerCase() === 'f' && !formVisible) {
+        console.log('🔧 Mostrando formulario por tecla F...');
+        showSignupForm();
+    }
+    
+    // Testing: si presiona 'B' iniciar parpadeo
+    if (e.key.toLowerCase() === 'b') {
+        console.log('🔧 Iniciando parpadeo por tecla B...');
+        startBlinking();
+    }
+});
+
+// Iniciar audio al tocar la pantalla (móvil)
+document.addEventListener('touchstart', function(e) {
+    startAudio();
+    const touch = e.touches[0];
+    createMultipleLogos(touch.clientX, touch.clientY);
+});
+
+// Event listener para touchmove en móviles
+document.addEventListener('touchmove', function(e) {
+    startAudio();
+    const touch = e.touches[0];
+    createMultipleLogos(touch.clientX, touch.clientY);
+});
+
+// Crear logos aleatorios de vez en cuando
+setInterval(() => {
+    if (!isMouseMoving) {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        createLogo(x, y);
+    }
+}, 3000); // Cada 3 segundos
+
+// Inicializar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar audio
+    joeyAudio = document.getElementById('joeyAudio');
+    
+    preloadLogos();
+    
+    // Configurar el audio
+    if (joeyAudio) {
+        joeyAudio.volume = 0.7; // Volumen al 70%
+        joeyAudio.addEventListener('ended', function() {
+            // Si por alguna razón el audio termina, reiniciarlo
+            joeyAudio.currentTime = 0;
+            if (audioStarted && !isMuted) {
+                joeyAudio.play();
+            }
+        });
+        
+        // Intentar cargar el audio
+        joeyAudio.load();
+        console.log('Audio configurado');
+    }
+    
+    // Configurar formulario
+    const signupForm = document.getElementById('joeySignupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // Configurar botón de mute
+    const muteBtn = document.getElementById('muteBtn');
+    if (muteBtn) {
+        muteBtn.addEventListener('click', toggleMute);
+    }
+    
+    // Agregar botón de test para probar el parpadeo manualmente
+    setTimeout(() => {
+        console.log('🎵 Mueve el ratón o haz click para activar la música de Joey Cash!');
+        console.log('📝 El formulario aparecerá después de 5.3 segundos (en el drop)');
+        console.log('🎵 17 parpadeos sincronizados con el ritmo hasta el final (12s)');
+        console.log('🔊 Usa el botón de la esquina superior derecha para silenciar');
+        console.log('🔧 Testing: F=formulario, B=parpadeo');
+    }, 1000);
+});
+
+// Redimensionar la página
+window.addEventListener('resize', function() {
+    // Limpiar logos que puedan estar fuera de la nueva ventana
+    const logos = document.querySelectorAll('.joey-logo');
+    logos.forEach(logo => {
+        const rect = logo.getBoundingClientRect();
+        if (rect.left < -100 || rect.top < -100 || 
+            rect.left > window.innerWidth + 100 || 
+            rect.top > window.innerHeight + 100) {
+            logo.style.opacity = '0';
+            setTimeout(() => {
+                if (logo.parentNode) {
+                    logo.parentNode.removeChild(logo);
+                }
+            }, 500);
+        }
+    });
+});
