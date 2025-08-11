@@ -1,4 +1,3 @@
-// Array de colores disponibles
 const colors = [
     'color-red',
     'color-yellow', 
@@ -11,7 +10,6 @@ const colors = [
     'color-pink'
 ];
 
-// Array de tamaños
 const sizes = [
     'size-tiny',
     'size-small',
@@ -20,7 +18,6 @@ const sizes = [
     'size-xlarge'
 ];
 
-// Array de deformaciones
 const deformations = [
     'skew-1', 'skew-2', 'skew-3', 'skew-4',
     'rotate-1', 'rotate-2', 'rotate-3', 'rotate-4',
@@ -28,15 +25,13 @@ const deformations = [
     'combo-1', 'combo-2', 'combo-3', 'combo-4'
 ];
 
-// Array de animaciones opcionales
 const animations = [
-    '', '', '', // Más posibilidades de no tener animación
+    '', '', '', 
     'animate-float',
     'animate-pulse',
     'animate-wiggle'
 ];
 
-// Variables de audio
 let audioStarted = false;
 let joeyAudio;
 let formVisible = false;
@@ -45,225 +40,157 @@ let blinkInterval;
 let audioStartTime = 0;
 let isMuted = false;
 
-// Función para iniciar el audio
 function startAudio() {
     if (!audioStarted && joeyAudio && !isMuted) {
-        // Configurar el audio
         joeyAudio.volume = 0.7;
-        
         joeyAudio.play().then(() => {
             audioStarted = true;
-            console.log('🎵 Audio iniciado correctamente - empezando countdown de 5.3 segundos');
-            
-            // Esperar 5.3 segundos para el drop y luego mostrar formulario
             setTimeout(() => {
                 showSignupForm();
-            }, 5300); // 5.3 segundos
-            
+            }, 5300);
         }).catch(error => {
-            console.log('❌ Error al reproducir audio:', error);
-            console.log('🔧 Tip: Algunos navegadores requieren interacción del usuario para reproducir audio');
-            // Si falla el audio, mostrar el formulario inmediatamente para testing
             setTimeout(() => {
-                console.log('🔧 Audio falló, mostrando formulario para testing...');
                 showSignupForm();
             }, 2000);
         });
     }
 }
 
-// Función para alternar mute/unmute
 function toggleMute() {
     const speakerIcon = document.getElementById('speakerIcon');
-    
     if (isMuted) {
-        // Unmute
         isMuted = false;
         if (joeyAudio) {
             joeyAudio.muted = false;
         }
         speakerIcon.textContent = '🔊';
-        console.log('🔊 Audio activado');
     } else {
-        // Mute
         isMuted = true;
         if (joeyAudio) {
             joeyAudio.muted = true;
         }
         speakerIcon.textContent = '🔇';
-        console.log('🔇 Audio silenciado');
     }
 }
 
-// Función para mostrar el formulario
 function showSignupForm() {
     const signupForm = document.getElementById('signupForm');
     if (signupForm && !formVisible) {
         formVisible = true;
         signupForm.classList.add('visible');
-        console.log('Formulario mostrado');
-        
-        // Aplicar efectos de colores al texto
         createColoredText('JOIN NOW', 'joinText');
         createColoredText('SUBMIT', 'submitBtn');
-        
-        // Aplicar efectos a los inputs
         const nameInput = document.getElementById('signupName');
         const emailInput = document.getElementById('signupEmail');
-        
         if (nameInput) {
             applyColoredInput(nameInput);
-            // Crear placeholder colorido
             nameInput.setAttribute('data-placeholder', 'NAME');
         }
-        
         if (emailInput) {
             applyColoredInput(emailInput);
-            // Crear placeholder colorido
             emailInput.setAttribute('data-placeholder', 'EMAIL');
         }
-        
-        // Iniciar parpadeo después de que aparezca
         setTimeout(() => {
             startBlinking();
         }, 1000);
     }
 }
 
-// Función para el efecto de parpadeo sincronizado con el ritmo
 function startBlinking() {
-    console.log('🎵 Iniciando parpadeo sincronizado con el ritmo (17 punches)');
     const signupForm = document.getElementById('signupForm');
     const body = document.body;
     blinkCount = 0;
-    
-    // Calcular timing: desde 5.3s hasta 12s = 6.7 segundos para 17 parpadeos
-    // 6700ms / 17 parpadeos = ~394ms por parpadeo
-    const blinkDuration = 6700 / 17; // ~394ms por parpadeo
-    
+    const blinkDuration = 6700 / 17;
     blinkInterval = setInterval(() => {
         if (blinkCount < 17) {
-            // Alternar inversión de colores para simular los punches
             if (blinkCount % 2 === 0) {
                 body.style.filter = 'invert(1)';
-                console.log(`🎵 Punch ${Math.floor(blinkCount/2) + 1}/17 - ON`);
             } else {
                 body.style.filter = 'invert(0)';
-                console.log(`🎵 Punch ${Math.floor(blinkCount/2) + 1}/17 - OFF`);
             }
             blinkCount++;
         } else {
-            // Detener parpadeo al final de la canción
             clearInterval(blinkInterval);
             body.style.filter = 'invert(0)';
-            console.log('🎵 Parpadeo terminado - fin de la canción');
         }
     }, blinkDuration);
 }
 
-// Manejar envío del formulario
 function handleFormSubmit(e) {
     e.preventDefault();
     const name = document.getElementById('signupName').value;
     const email = document.getElementById('signupEmail').value;
     const messageDiv = document.getElementById('formMessage');
-    
     if (name && email) {
-        // Mostrar mensaje de éxito
         messageDiv.innerHTML = '';
         messageDiv.className = 'form-message success';
         messageDiv.style.display = 'block';
-        
-        // Crear texto colorido para el mensaje
         const successMessage = `WELCOME ${name.toUpperCase()}! YOU'RE IN THE JOURNEY!`;
         createColoredTextInElement(successMessage, messageDiv);
-        
-        // Ocultar los campos del formulario
         document.getElementById('signupName').style.display = 'none';
         document.getElementById('signupEmail').style.display = 'none';
         document.getElementById('submitBtn').style.display = 'none';
         document.getElementById('joinText').style.display = 'none';
-        
     } else {
-        // Mostrar mensaje de error
         messageDiv.innerHTML = '';
         messageDiv.className = 'form-message error';
         messageDiv.style.display = 'block';
-        
         const errorMessage = 'PLEASE FILL ALL FIELDS!';
         createColoredTextInElement(errorMessage, messageDiv);
     }
 }
 
-// Función auxiliar para crear texto colorido en cualquier elemento
 function createColoredTextInElement(text, element) {
     element.innerHTML = '';
-    
     for (let i = 0; i < text.length; i++) {
         const letter = text[i];
         const span = document.createElement('span');
         span.className = 'letter';
-        
-        // Cada 3ra letra es minúscula, las demás mayúsculas
         if ((i + 1) % 3 === 0) {
             span.textContent = letter.toLowerCase();
         } else {
             span.textContent = letter.toUpperCase();
         }
-        
-        // Asignar color aleatorio si no es espacio
         if (letter !== ' ') {
             const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
             span.classList.add(randomColor);
         }
-        
         element.appendChild(span);
     }
 }
 
-// Array de colores para las letras
 const letterColors = [
     'letter-red', 'letter-yellow', 'letter-orange',
     'letter-light-blue', 'letter-dark-blue', 'letter-green',
     'letter-purple', 'letter-lilac', 'letter-pink'
 ];
 
-// Función para crear texto con letras coloridas y patrón mayúscula/minúscula
 function createColoredText(text, elementId) {
     const element = document.getElementById(elementId);
     if (!element) return;
-    
     element.innerHTML = '';
-    
     for (let i = 0; i < text.length; i++) {
         const letter = text[i];
         const span = document.createElement('span');
         span.className = 'letter';
-        
-        // Cada 3ra letra es minúscula, las demás mayúsculas
         if ((i + 1) % 3 === 0) {
             span.textContent = letter.toLowerCase();
         } else {
             span.textContent = letter.toUpperCase();
         }
-        
-        // Asignar color aleatorio si no es espacio
         if (letter !== ' ') {
             const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
             span.classList.add(randomColor);
         }
-        
         element.appendChild(span);
     }
 }
 
-// Función para crear placeholders coloridos
 function createColoredPlaceholder(text) {
     let coloredText = '';
     for (let i = 0; i < text.length; i++) {
         const letter = text[i];
         if (letter !== ' ') {
-            // Cada 3ra letra es minúscula, las demás mayúsculas
             const finalLetter = (i + 1) % 3 === 0 ? letter.toLowerCase() : letter.toUpperCase();
             const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
             coloredText += `<span class="letter ${randomColor}">${finalLetter}</span>`;
@@ -274,17 +201,13 @@ function createColoredPlaceholder(text) {
     return coloredText;
 }
 
-// Función para aplicar efecto de colores al texto que escribe el usuario
 function applyColoredInput(inputElement) {
     inputElement.addEventListener('input', function() {
         const value = this.value;
-        // Crear un elemento temporal para mostrar el texto coloreado
         let coloredValue = '';
-        
         for (let i = 0; i < value.length; i++) {
             const letter = value[i];
             if (letter !== ' ') {
-                // Cada 3ra letra es minúscula, las demás mayúsculas
                 const finalLetter = (i + 1) % 3 === 0 ? letter.toLowerCase() : letter.toUpperCase();
                 const randomColor = letterColors[Math.floor(Math.random() * letterColors.length)];
                 coloredValue += finalLetter;
@@ -292,13 +215,10 @@ function applyColoredInput(inputElement) {
                 coloredValue += ' ';
             }
         }
-        
-        // Actualizar el valor del input transformado
         this.value = coloredValue;
     });
 }
 
-// SVG del logo Joey (base)
 const logoSVG = `
 <svg viewBox="0 0 816 306" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(0,306) scale(0.1,-0.1)" fill="currentColor" stroke="none">
@@ -326,7 +246,7 @@ const logoSVG = `
 16 -10 22 -27 22 -17 0 -25 -6 -27 -22z m82 -357 c0 -10 9 -21 20 -24 12 -3
 20 -14 20 -26 0 -14 6 -21 20 -21 15 0 20 -7 20 -25 0 -14 5 -25 10 -25 6 0
 10 -20 10 -45 0 -25 5 -45 10 -45 6 0 10 -9 10 -19 0 -10 7 -22 16 -25 14 -5
-16 -20 12 -96 -3 -69 -1 -90 9 -90 19 0 19 -548 1 -555 -9 -4 -12 -24 -10 -65
+16 -20 12 -96-3 -69 -1 -90 9 -90 19 0 19 -548 1 -555 -9 -4 -12 -24 -10 -65
 3 -48 1 -61 -12 -66 -11 -4 -16 -19 -16 -49 0 -24 -4 -47 -10 -50 -5 -3 -10
 -26 -10 -51 0 -24 -4 -44 -10 -44 -5 0 -10 -9 -10 -20 0 -13 -7 -20 -20 -20
 -14 0 -20 -7 -20 -21 0 -12 -8 -23 -19 -26 -11 -3 -21 -15 -23 -27 -3 -18 -11
@@ -505,46 +425,31 @@ c0 40 4 70 10 70 6 0 10 30 10 69 0 52 4 70 15 75 12 4 15 25 15 96 0 53 4 90
 </svg>
 `;
 
-// Variables para controlar la aparición de logos
 let logoIndex = 0;
 let lastMousePosition = { x: 0, y: 0 };
 let isMouseMoving = false;
 let mouseTimeout;
 
-// Función para obtener una clase aleatoria de un array
 function getRandomClass(classArray) {
     return classArray[Math.floor(Math.random() * classArray.length)];
 }
 
-// Función para crear un logo en una posición específica
 function createLogo(x, y) {
     const logoContainer = document.getElementById('logoContainer');
     const logoElement = document.createElement('div');
-    
-    // Configurar el elemento
     logoElement.innerHTML = logoSVG;
     logoElement.className = 'joey-logo';
     logoElement.id = `logo-${logoIndex++}`;
-    
-    // Añadir clases aleatorias
     logoElement.classList.add(getRandomClass(colors));
     logoElement.classList.add(getRandomClass(sizes));
     logoElement.classList.add(getRandomClass(deformations));
     logoElement.classList.add(getRandomClass(animations));
-    
-    // Posicionar el logo
-    logoElement.style.left = (x - 25) + 'px'; // Centrar en el cursor
+    logoElement.style.left = (x - 25) + 'px';
     logoElement.style.top = (y - 25) + 'px';
-    
-    // Añadir al container
     logoContainer.appendChild(logoElement);
-    
-    // Hacer visible con fade in
     setTimeout(() => {
         logoElement.classList.add('visible');
     }, 10);
-    
-    // Opcional: eliminar el logo después de un tiempo para no saturar la página
     setTimeout(() => {
         if (logoElement && logoElement.parentNode) {
             logoElement.style.opacity = '0';
@@ -554,62 +459,44 @@ function createLogo(x, y) {
                 }
             }, 500);
         }
-    }, 15000); // 15 segundos
+    }, 15000);
 }
 
-// Función para crear logos múltiples en posiciones aleatorias cerca del cursor
 function createMultipleLogos(centerX, centerY) {
-    const numLogos = Math.floor(Math.random() * 3) + 1; // 1-3 logos
-    
+    const numLogos = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < numLogos; i++) {
-        // Crear posición aleatoria cerca del cursor
-        const offsetX = (Math.random() - 0.5) * 100; // -50 a 50 pixels
+        const offsetX = (Math.random() - 0.5) * 100;
         const offsetY = (Math.random() - 0.5) * 100;
         const x = centerX + offsetX;
         const y = centerY + offsetY;
-        
-        // Asegurar que esté dentro de la pantalla
         const clampedX = Math.max(25, Math.min(window.innerWidth - 25, x));
         const clampedY = Math.max(25, Math.min(window.innerHeight - 25, y));
-        
         createLogo(clampedX, clampedY);
     }
 }
 
-// Función para prellenar la página con logos
 function preloadLogos() {
-    const numPreloadLogos = 50; // Número de logos iniciales
-    
+    const numPreloadLogos = 50;
     for (let i = 0; i < numPreloadLogos; i++) {
         const x = Math.random() * window.innerWidth;
         const y = Math.random() * window.innerHeight;
-        
         setTimeout(() => {
             createLogo(x, y);
-        }, Math.random() * 2000); // Aparecer en los primeros 2 segundos
+        }, Math.random() * 2000);
     }
 }
 
-// Event listeners
 document.addEventListener('mousemove', function(e) {
-    // Iniciar audio en la primera interacción
     startAudio();
-    
     const currentTime = Date.now();
-    
-    // Calcular distancia del movimiento
     const distance = Math.sqrt(
         Math.pow(e.clientX - lastMousePosition.x, 2) + 
         Math.pow(e.clientY - lastMousePosition.y, 2)
     );
-    
-    // Solo crear logos si el mouse se movió una distancia mínima
     if (distance > 20) {
         createMultipleLogos(e.clientX, e.clientY);
         lastMousePosition = { x: e.clientX, y: e.clientY };
     }
-    
-    // Marcar que el mouse se está moviendo
     isMouseMoving = true;
     clearTimeout(mouseTimeout);
     mouseTimeout = setTimeout(() => {
@@ -617,109 +504,71 @@ document.addEventListener('mousemove', function(e) {
     }, 100);
 });
 
-// Crear logos al hacer click
 document.addEventListener('click', function(e) {
-    // Iniciar audio en la primera interacción
     startAudio();
     createMultipleLogos(e.clientX, e.clientY);
-    
-    // Testing: mostrar formulario inmediatamente en click
     if (!formVisible) {
         setTimeout(() => {
-            console.log('🔧 Mostrando formulario por click...');
             showSignupForm();
         }, 1000);
     }
 });
 
-// Iniciar audio con cualquier tecla presionada
 document.addEventListener('keydown', function(e) {
     startAudio();
-    
-    // Testing: si presiona 'F' mostrar formulario
     if (e.key.toLowerCase() === 'f' && !formVisible) {
-        console.log('🔧 Mostrando formulario por tecla F...');
         showSignupForm();
     }
-    
-    // Testing: si presiona 'B' iniciar parpadeo
     if (e.key.toLowerCase() === 'b') {
-        console.log('🔧 Iniciando parpadeo por tecla B...');
         startBlinking();
     }
 });
 
-// Iniciar audio al tocar la pantalla (móvil)
 document.addEventListener('touchstart', function(e) {
     startAudio();
     const touch = e.touches[0];
     createMultipleLogos(touch.clientX, touch.clientY);
 });
 
-// Event listener para touchmove en móviles
 document.addEventListener('touchmove', function(e) {
     startAudio();
     const touch = e.touches[0];
     createMultipleLogos(touch.clientX, touch.clientY);
 });
 
-// Crear logos aleatorios de vez en cuando
 setInterval(() => {
     if (!isMouseMoving) {
         const x = Math.random() * window.innerWidth;
         const y = Math.random() * window.innerHeight;
         createLogo(x, y);
     }
-}, 3000); // Cada 3 segundos
+}, 3000);
 
-// Inicializar la página
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar audio
     joeyAudio = document.getElementById('joeyAudio');
-    
     preloadLogos();
-    
-    // Configurar el audio
     if (joeyAudio) {
-        joeyAudio.volume = 0.7; // Volumen al 70%
+        joeyAudio.volume = 0.7;
         joeyAudio.addEventListener('ended', function() {
-            // Si por alguna razón el audio termina, reiniciarlo
             joeyAudio.currentTime = 0;
             if (audioStarted && !isMuted) {
                 joeyAudio.play();
             }
         });
-        
-        // Intentar cargar el audio
         joeyAudio.load();
-        console.log('Audio configurado');
     }
-    
-    // Configurar formulario
     const signupForm = document.getElementById('joeySignupForm');
     if (signupForm) {
         signupForm.addEventListener('submit', handleFormSubmit);
     }
-    
-    // Configurar botón de mute
     const muteBtn = document.getElementById('muteBtn');
     if (muteBtn) {
         muteBtn.addEventListener('click', toggleMute);
     }
-    
-    // Agregar botón de test para probar el parpadeo manualmente
-    setTimeout(() => {
-        console.log('🎵 Mueve el ratón o haz click para activar la música de Joey Cash!');
-        console.log('📝 El formulario aparecerá después de 5.3 segundos (en el drop)');
-        console.log('🎵 17 parpadeos sincronizados con el ritmo hasta el final (12s)');
-        console.log('🔊 Usa el botón de la esquina superior derecha para silenciar');
-        console.log('🔧 Testing: F=formulario, B=parpadeo');
-    }, 1000);
+    setTimeout(() => {}, 1000);
 });
 
-// Redimensionar la página
 window.addEventListener('resize', function() {
-    // Limpiar logos que puedan estar fuera de la nueva ventana
     const logos = document.querySelectorAll('.joey-logo');
     logos.forEach(logo => {
         const rect = logo.getBoundingClientRect();
